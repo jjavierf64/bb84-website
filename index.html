@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BB84 Kid Quest — Learn Quantum Key Distribution</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --text:#e9eeff;
+      --muted:#aab4e6;
+      --accent:#7cf6c2;
+      --accent2:#8aa2ff;
+      --warn:#ffcc66;
+      --bad:#ff6b8a;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --round: 18px;
+      --round2: 14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 600px at 20% 10%, #1b2a6d55, transparent 55%),
+                  radial-gradient(800px 500px at 90% 30%, #0fd7a155, transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+
+    /* ✅ MUCH wider playground + slim fixed sidebar */
+    .app{
+      width:min(1400px, 100%);
+      display:grid;
+      grid-template-columns: 1fr 320px;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .app{grid-template-columns:1fr}
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: var(--round);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    header{
+      padding:16px 18px;
+      background: linear-gradient(180deg, rgba(138,162,255,.18), transparent);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    header h1{ margin:0; font-size:18px; letter-spacing:.2px; }
+    header p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+      max-width:70ch;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      background: rgba(124,246,194,.10);
+      border:1px solid rgba(124,246,194,.28);
+      color: var(--accent);
+      font-size:12px;
+      white-space:nowrap;
+      height: fit-content;
+    }
+    .pill b{color:var(--text)}
+    .content{ padding:12px; }
+
+    /* GAME BOARD */
+    .board{
+      position:relative;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border-radius: var(--round2);
+      border:1px solid rgba(255,255,255,.08);
+      padding:12px;
+      overflow:hidden;
+      min-height:380px;
+    }
+    .lanes{
+      display:grid;
+      grid-template-columns: 1fr 1.35fr 1fr; /* ✅ slightly more room for channel too */
+      gap:12px;
+      align-items:stretch;
+    }
+    @media (max-width: 980px){
+      .lanes{grid-template-columns:1fr; }
+    }
+
+    .lane{
+      background: rgba(10,14,34,.55);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: var(--round2);
+      padding:12px;
+      position:relative;
+      min-height:310px;
+    }
+    .lane h2{
+      margin:0 0 8px;
+      font-size:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .tag{
+      font-size:11px;
+      color:var(--muted);
+      padding:5px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+
+    .character{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-top:8px;
+      padding:10px;
+      border-radius:14px;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .avatar{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      font-size:22px;
+      background: linear-gradient(180deg, rgba(124,246,194,.25), rgba(124,246,194,.08));
+      border:1px solid rgba(124,246,194,.25);
+      flex:0 0 auto;
+    }
+    .avatar.bob{
+      background: linear-gradient(180deg, rgba(138,162,255,.25), rgba(138,162,255,.08));
+      border:1px solid rgba(138,162,255,.25);
+    }
+    .character .meta{ display:flex; flex-direction:column; gap:2px; }
+    .character .meta b{ font-size:13px; }
+    .character .meta span{ font-size:12px; color:var(--muted); }
+
+    .controls{ margin-top:10px; display:grid; gap:10px; }
+    .row{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+
+    button{
+      cursor:pointer;
+      border:none;
+      border-radius: 14px;
+      padding:10px 12px;
+      font-weight:700;
+      font-size:13px;
+      color:var(--text);
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      user-select:none;
+    }
+    button:hover{ background: rgba(255,255,255,.10); }
+    button:active{ transform: translateY(1px) scale(.99); }
+    button.primary{
+      background: rgba(124,246,194,.15);
+      border-color: rgba(124,246,194,.35);
+    }
+    button.primary:hover{ background: rgba(124,246,194,.22); }
+    button.blue{
+      background: rgba(138,162,255,.16);
+      border-color: rgba(138,162,255,.35);
+    }
+    button.blue:hover{ background: rgba(138,162,255,.24); }
+    button.warn{
+      background: rgba(255,204,102,.14);
+      border-color: rgba(255,204,102,.34);
+      color: #fff4d6;
+    }
+    button.danger{
+      background: rgba(255,107,138,.14);
+      border-color: rgba(255,107,138,.35);
+    }
+    button:disabled{ opacity:.45; cursor:not-allowed; transform:none; }
+
+    .bigChoice{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .choice{
+      padding:12px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      display:grid;
+      gap:6px;
+      text-align:left;
+    }
+    .choice b{font-size:14px}
+    .choice span{font-size:12px; color:var(--muted); line-height:1.35}
+    .choice .icon{font-size:18px; opacity:.95}
+    .choice.selected{
+      outline: 2px solid rgba(124,246,194,.55);
+      background: rgba(124,246,194,.08);
+    }
+
+    /* CHANNEL */
+    .channel{ position:relative; height:100%; display:flex; flex-direction:column; gap:10px; }
+    .pipe{
+      position:relative;
+      flex:1;
+      border-radius: 16px;
+      border:1px dashed rgba(255,255,255,.14);
+      background: radial-gradient(650px 260px at 50% 20%, rgba(124,246,194,.10), transparent 55%),
+                  radial-gradient(650px 260px at 50% 85%, rgba(138,162,255,.10), transparent 55%),
+                  rgba(255,255,255,.03);
+      overflow:hidden;
+
+      min-height:240px;
+
+      /* ✅ Reserve space at the top so the bubble never covers the photon */
+      padding-top:84px;
+    }
+    .pipe:before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,.05) 0px,
+        rgba(255,255,255,.05) 10px,
+        transparent 10px,
+        transparent 24px
+      );
+      opacity:.35;
+      pointer-events:none;
+    }
+    .labels{ display:flex; justify-content:space-between; font-size:12px; color:var(--muted); }
+
+    .photon{
+      position:absolute;
+      /* ✅ Fly below bubble */
+      top:60%;
+      left:12%;
+      transform: translate(-50%, -50%);
+      width:46px;
+      height:46px;
+      border-radius: 18px;
+      display:grid;
+      place-items:center;
+      font-size:20px;
+      background: rgba(124,246,194,.18);
+      border:1px solid rgba(124,246,194,.35);
+      box-shadow: 0 0 24px rgba(124,246,194,.15);
+      opacity:0;
+      z-index: 2;
+    }
+    .photon.blue{
+      background: rgba(138,162,255,.18);
+      border:1px solid rgba(138,162,255,.35);
+      box-shadow: 0 0 24px rgba(138,162,255,.15);
+    }
+    .photon.show{ opacity:1; transition: opacity .25s ease; }
+
+    @keyframes fly {
+      0%   { left: 12%; transform: translate(-50%,-50%) scale(1); }
+      100% { left: 88%; transform: translate(-50%,-50%) scale(1.02); }
+    }
+    .photon.fly{ animation: fly 1.25s ease-in-out forwards; }
+
+    @keyframes pop {
+      0% { transform: translateX(-50%) scale(.92); opacity:.0; }
+      60% { transform: translateX(-50%) scale(1.03); opacity:1; }
+      100% { transform: translateX(-50%) scale(1); opacity:1; }
+    }
+
+    /* ✅ Bubble pinned to top (no longer centered over the photon) */
+    .bubble{
+      position:absolute;
+      left:50%;
+      top:12px;
+      transform: translateX(-50%);
+      width:min(640px, 94%);
+      padding:12px 14px;
+      border-radius: 16px;
+      background: rgba(19,26,51,.92);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: var(--shadow);
+      display:none;
+      gap:8px;
+      color: var(--text);
+      z-index: 3;
+      pointer-events:none; /* ✅ can't block clicks/interaction */
+      backdrop-filter: blur(6px);
+    }
+    .bubble.show{ display:grid; animation: pop .22s ease-out; }
+    .bubble .title{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      font-weight:800; font-size:13px;
+    }
+    .bubble .text{ font-size:12px; color: var(--muted); line-height:1.45; }
+
+    /* SIDE */
+    .side{ display:grid; gap:14px; }
+    .panel{ padding:14px; }
+    .panel h3{ margin:0 0 8px; font-size:14px; }
+
+    .status{ display:grid; gap:10px; }
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .stat{
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      padding:10px;
+      display:grid;
+      gap:4px;
+    }
+    .stat span{font-size:11px; color:var(--muted)}
+    .stat b{font-size:14px}
+    .keyline{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+    .bit{
+      width:26px;
+      height:26px;
+      border-radius: 10px;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      font-size:13px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+    }
+    .bit.keep{
+      border-color: rgba(124,246,194,.35);
+      background: rgba(124,246,194,.10);
+      color: var(--accent);
+    }
+    .footerHint{
+      color: var(--muted);
+      font-size:12px;
+      padding:0 2px;
+      line-height:1.45;
+    }
+
+    @keyframes twinkle {
+      0%{opacity:.0; transform: translateY(4px) scale(.95);}
+      45%{opacity:1; transform: translateY(0) scale(1);}
+      100%{opacity:0; transform: translateY(-6px) scale(.98);}
+    }
+    .sparkle{
+      position:absolute;
+      pointer-events:none;
+      font-size:14px;
+      animation: twinkle .7s ease-out forwards;
+      opacity:0;
+      filter: drop-shadow(0 0 10px rgba(124,246,194,.25));
+      z-index: 4;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <!-- MAIN -->
+    <section class="card">
+      <header>
+        <div>
+          <h1>BB84 Kid Quest 🧪🔑</h1>
+          <p>
+            You are <b>Alice</b>. Pick a secret bit (0/1) and a “magic lens” (basis ➕ or ✖).
+            Send a photon to <b>Bob</b>, who measures with a random lens.
+            If your lenses match, you keep that bit for your shared secret key!
+          </p>
+        </div>
+        <div class="pill">
+          <span>Goal:</span> <b>Build a key</b>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="board">
+          <div class="lanes">
+            <!-- ALICE -->
+            <div class="lane" id="laneAlice">
+              <h2>
+                Alice (You) 🐰
+                <span class="tag" id="aliceStepTag">Step 1/4</span>
+              </h2>
+
+              <div class="character">
+                <div class="avatar">🐰</div>
+                <div class="meta">
+                  <b>Pick a bit + basis</b>
+                  <span>Bit is 0 or 1. Basis is ➕ or ✖.</span>
+                </div>
+              </div>
+
+              <div class="controls">
+                <div class="bigChoice" id="bitChoices">
+                  <div class="choice" data-bit="0" tabindex="0">
+                    <div class="icon">0️⃣</div>
+                    <b>Bit = 0</b>
+                    <span>Like “off” / “no” / “left”.</span>
+                  </div>
+                  <div class="choice" data-bit="1" tabindex="0">
+                    <div class="icon">1️⃣</div>
+                    <b>Bit = 1</b>
+                    <span>Like “on” / “yes” / “right”.</span>
+                  </div>
+                </div>
+
+                <div class="bigChoice" id="basisChoices">
+                  <div class="choice" data-basis="PLUS" tabindex="0">
+                    <div class="icon">➕</div>
+                    <b>Basis = ➕</b>
+                    <span>“Straight” lens.</span>
+                  </div>
+                  <div class="choice" data-basis="CROSS" tabindex="0">
+                    <div class="icon">✖</div>
+                    <b>Basis = ✖</b>
+                    <span>“Diagonal” lens.</span>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <button class="primary" id="btnEncode" disabled>Encode Photon ✨</button>
+                  <button class="warn" id="btnResetRound">Reset Round ↩️</button>
+                </div>
+
+                <button class="primary" id="btnSend" disabled>Send Through Channel 🚀</button>
+              </div>
+
+              <div class="footerHint">
+                Tip: If Bob uses the wrong lens (basis), his measurement becomes random.
+              </div>
+            </div>
+
+            <!-- CHANNEL -->
+            <div class="lane">
+              <h2>
+                Quantum Channel 🌌
+                <span class="tag">Animated</span>
+              </h2>
+
+              <div class="channel">
+                <div class="labels">
+                  <span>from Alice</span>
+                  <span>to Bob</span>
+                </div>
+
+                <div class="pipe" id="pipe">
+                  <div class="photon" id="photon" aria-label="photon">⚛️</div>
+
+                  <div class="bubble" id="bubble">
+                    <div class="title">
+                      <span id="bubbleTitle">Ready!</span>
+                      <span class="tag">BB84</span>
+                    </div>
+                    <div class="text" id="bubbleText">
+                      Pick a bit and a basis, then encode and send.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <button class="blue" id="btnRevealBases" disabled>Reveal Bases 🗣️</button>
+                  <button class="blue" id="btnNextRound" disabled>Next Photon ➡️</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- BOB -->
+            <div class="lane" id="laneBob">
+              <h2>
+                Bob 🤖
+                <span class="tag" id="bobStepTag">Waiting…</span>
+              </h2>
+
+              <div class="character">
+                <div class="avatar bob">🤖</div>
+                <div class="meta">
+                  <b>Bob measures randomly</b>
+                  <span>He picks ➕ or ✖ and measures.</span>
+                </div>
+              </div>
+
+              <div class="controls">
+                <div class="stat">
+                  <span>Bob's chosen basis</span>
+                  <b id="bobBasis">—</b>
+                </div>
+                <div class="stat">
+                  <span>Bob's measured bit</span>
+                  <b id="bobBit">—</b>
+                </div>
+                <button class="blue" id="btnMeasure" disabled>Bob Measures 🎛️</button>
+              </div>
+
+              <div class="footerHint">
+                Fun fact: Wrong basis → random result 🎲
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIDE -->
+    <aside class="side">
+      <section class="card panel">
+        <h3>Scoreboard 📟</h3>
+        <div class="status">
+          <div class="grid2">
+            <div class="stat">
+              <span>Photons sent</span>
+              <b id="sentCount">0</b>
+            </div>
+            <div class="stat">
+              <span>Kept (matching bases)</span>
+              <b id="keptCount">0</b>
+            </div>
+          </div>
+
+          <div class="stat">
+            <span>Sifted key (kept bits)</span>
+            <div class="keyline" id="keyBits"></div>
+          </div>
+
+          <div class="footerHint">
+            Keep bits only when bases match (➕➕ or ✖✖). That’s <b>sifting</b>.
+          </div>
+        </div>
+      </section>
+
+      <section class="card panel">
+        <h3>Big Idea 🧠</h3>
+        <div class="footerHint">
+          Alice encodes using a secret basis (➕ or ✖). Bob measures using a random basis.
+          Later they compare bases (not bits). Matching bases become shared secret bits.
+        </div>
+        <div style="margin-top:10px; display:grid; gap:10px;">
+          <button class="danger" id="btnResetAll">Reset Everything 🧼</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <script>
+    const state = {
+      phase: "PICK",
+      aliceBit: null,
+      aliceBasis: null,
+      bobBasis: null,
+      bobBit: null,
+      sent: 0,
+      kept: 0,
+      key: []
+    };
+
+    const bitChoices = document.getElementById("bitChoices");
+    const basisChoices = document.getElementById("basisChoices");
+    const btnEncode = document.getElementById("btnEncode");
+    const btnSend = document.getElementById("btnSend");
+    const btnMeasure = document.getElementById("btnMeasure");
+    const btnRevealBases = document.getElementById("btnRevealBases");
+    const btnNextRound = document.getElementById("btnNextRound");
+    const btnResetRound = document.getElementById("btnResetRound");
+    const btnResetAll = document.getElementById("btnResetAll");
+
+    const aliceStepTag = document.getElementById("aliceStepTag");
+    const bobStepTag = document.getElementById("bobStepTag");
+
+    const photon = document.getElementById("photon");
+    const pipe = document.getElementById("pipe");
+
+    const bubble = document.getElementById("bubble");
+    const bubbleTitle = document.getElementById("bubbleTitle");
+    const bubbleText = document.getElementById("bubbleText");
+
+    const bobBasisEl = document.getElementById("bobBasis");
+    const bobBitEl = document.getElementById("bobBit");
+
+    const sentCount = document.getElementById("sentCount");
+    const keptCount = document.getElementById("keptCount");
+    const keyBits = document.getElementById("keyBits");
+
+    const randBit = () => (Math.random() < 0.5 ? 0 : 1);
+    const randBasis = () => (Math.random() < 0.5 ? "PLUS" : "CROSS");
+    const basisIcon = (b) => (b === "PLUS" ? "➕" : b === "CROSS" ? "✖" : "—");
+
+    function setBubble(title, text){
+      bubbleTitle.textContent = title;
+      bubbleText.textContent = text;
+      bubble.classList.add("show");
+      clearTimeout(setBubble._t);
+      setBubble._t = setTimeout(() => bubble.classList.remove("show"), 2600);
+    }
+
+    function sparkle(x, y, char="✨"){
+      const s = document.createElement("div");
+      s.className = "sparkle";
+      s.textContent = char;
+      s.style.left = `${x}px`;
+      s.style.top = `${y}px`;
+      pipe.appendChild(s);
+      setTimeout(() => s.remove(), 800);
+    }
+
+    function updateUI(){
+      if (state.phase === "PICK"){
+        aliceStepTag.textContent = "Step 1/4";
+        bobStepTag.textContent = "Waiting…";
+      } else if (state.phase === "ENCODED"){
+        aliceStepTag.textContent = "Step 2/4";
+        bobStepTag.textContent = "Waiting…";
+      } else if (state.phase === "SENT"){
+        aliceStepTag.textContent = "Sent!";
+        bobStepTag.textContent = "Step 3/4";
+      } else if (state.phase === "MEASURED"){
+        aliceStepTag.textContent = "Sent!";
+        bobStepTag.textContent = "Measured!";
+      } else if (state.phase === "REVEALED"){
+        aliceStepTag.textContent = "Step 4/4";
+        bobStepTag.textContent = "Step 4/4";
+      }
+
+      const hasPick = state.aliceBit !== null && state.aliceBasis !== null;
+      btnEncode.disabled = !(state.phase === "PICK" && hasPick);
+      btnSend.disabled = !(state.phase === "ENCODED");
+      btnMeasure.disabled = !(state.phase === "SENT");
+      btnRevealBases.disabled = !(state.phase === "MEASURED");
+      btnNextRound.disabled = !(state.phase === "REVEALED");
+
+      bobBasisEl.textContent = basisIcon(state.bobBasis);
+      bobBitEl.textContent = (state.bobBit === null ? "—" : String(state.bobBit));
+
+      sentCount.textContent = String(state.sent);
+      keptCount.textContent = String(state.kept);
+
+      keyBits.innerHTML = "";
+      state.key.forEach((b) => {
+        const el = document.createElement("div");
+        el.className = "bit keep";
+        el.textContent = b;
+        keyBits.appendChild(el);
+      });
+      if(state.key.length === 0){
+        const ghost = document.createElement("div");
+        ghost.className = "bit";
+        ghost.style.opacity = ".6";
+        ghost.textContent = "—";
+        keyBits.appendChild(ghost);
+      }
+    }
+
+    function clearSelections(container){
+      [...container.querySelectorAll(".choice")].forEach(c => c.classList.remove("selected"));
+    }
+
+    function resetRound(){
+      state.phase = "PICK";
+      state.aliceBit = null;
+      state.aliceBasis = null;
+      state.bobBasis = null;
+      state.bobBit = null;
+
+      clearSelections(bitChoices);
+      clearSelections(basisChoices);
+
+      photon.className = "photon";
+      photon.style.left = "12%";
+      photon.style.opacity = "0";
+
+      updateUI();
+    }
+
+    function resetAll(){
+      state.sent = 0;
+      state.kept = 0;
+      state.key = [];
+      resetRound();
+      setBubble("Clean Slate 🧼", "Everything reset. Let's build a new key!");
+    }
+
+    function selectBit(bit){
+      state.aliceBit = bit;
+      clearSelections(bitChoices);
+      bitChoices.querySelector(`[data-bit="${bit}"]`).classList.add("selected");
+      setBubble("Bit chosen!", `Alice picked bit ${bit}. Now pick a basis (➕ or ✖).`);
+      updateUI();
+    }
+
+    function selectBasis(basis){
+      state.aliceBasis = basis;
+      clearSelections(basisChoices);
+      basisChoices.querySelector(`[data-basis="${basis}"]`).classList.add("selected");
+      setBubble("Basis chosen!", `Alice picked basis ${basisIcon(basis)}. Now encode!`);
+      updateUI();
+    }
+
+    bitChoices.addEventListener("click", (e) => {
+      const card = e.target.closest(".choice");
+      if(!card) return;
+      selectBit(Number(card.dataset.bit));
+    });
+    basisChoices.addEventListener("click", (e) => {
+      const card = e.target.closest(".choice");
+      if(!card) return;
+      selectBasis(card.dataset.basis);
+    });
+
+    function handleEnterSelect(container, handler){
+      container.addEventListener("keydown", (e) => {
+        if(e.key !== "Enter") return;
+        const card = e.target.closest(".choice");
+        if(!card) return;
+        handler(card);
+      });
+    }
+    handleEnterSelect(bitChoices, (card) => selectBit(Number(card.dataset.bit)));
+    handleEnterSelect(basisChoices, (card) => selectBasis(card.dataset.basis));
+
+    btnEncode.addEventListener("click", () => {
+      state.phase = "ENCODED";
+
+      photon.className = "photon show " + (state.aliceBasis === "CROSS" ? "blue" : "");
+      photon.textContent = (state.aliceBasis === "PLUS")
+        ? (state.aliceBit === 0 ? "⬇️" : "➡️")
+        : (state.aliceBit === 0 ? "↙️" : "↗️");
+
+      setBubble("Encoded! ✨", "Photon now carries your bit using your secret basis.");
+      updateUI();
+
+      const r = pipe.getBoundingClientRect();
+      sparkle(r.width * 0.18, r.height * 0.62, "✨");
+    });
+
+    btnSend.addEventListener("click", async () => {
+      state.phase = "SENT";
+      state.sent += 1;
+
+      setBubble("Whoosh! 🚀", "Photon is traveling through the quantum channel…");
+      updateUI();
+
+      photon.classList.add("fly");
+      photon.style.opacity = "1";
+
+      await wait(1300);
+
+      photon.classList.remove("fly");
+      photon.style.left = "88%";
+
+      setBubble("Arrived!", "Photon reached Bob. Now Bob measures with a random basis.");
+      updateUI();
+    });
+
+    btnMeasure.addEventListener("click", () => {
+      state.bobBasis = randBasis();
+      const match = (state.bobBasis === state.aliceBasis);
+      state.bobBit = match ? state.aliceBit : randBit();
+
+      state.phase = "MEASURED";
+
+      setBubble("Measured! 🎛️",
+        match
+          ? "Lucky! Bob used the same basis, so he gets the correct bit."
+          : "Oh no! Bob used a different basis, so the result becomes random."
+      );
+
+      const r = pipe.getBoundingClientRect();
+      sparkle(r.width * 0.85, r.height * 0.62, match ? "✅" : "🎲");
+
+      updateUI();
+    });
+
+    btnRevealBases.addEventListener("click", () => {
+      state.phase = "REVEALED";
+
+      const match = (state.bobBasis === state.aliceBasis);
+      if (match){
+        state.kept += 1;
+        state.key.push(String(state.aliceBit));
+      }
+
+      setBubble("Bases revealed 🗣️",
+        match
+          ? "Bases match! Keep this bit for your secret key 🔑"
+          : "Bases don’t match. Throw this bit away 🗑️"
+      );
+
+      updateUI();
+    });
+
+    btnNextRound.addEventListener("click", () => {
+      resetRound();
+      setBubble("Next Photon ➡️", "Pick a new bit and basis!");
+    });
+
+    btnResetRound.addEventListener("click", () => {
+      resetRound();
+      setBubble("Round reset ↩️", "Try again: pick a bit and basis.");
+    });
+
+    btnResetAll.addEventListener("click", resetAll);
+
+    function wait(ms){ return new Promise(res => setTimeout(res, ms)); }
+
+    // Start
+    resetRound();
+    setBubble("Welcome! 🎮", "Pick a bit (0/1) and a basis (➕/✖), then encode.");
+    updateUI();
+  </script>
+</body>
+</html>
