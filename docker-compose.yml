@@ -1,0 +1,9 @@
+services:
+  website:
+    image: nginx:alpine
+    container_name: bb84-website
+    ports:
+      - "8089:80"
+    volumes:
+      - ./:/usr/share/nginx/html:ro
+    restart: unless-stopped
