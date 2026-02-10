@@ -257,9 +257,9 @@
       width:min(640px, 100%);
       padding:10px 12px;
       border-radius: 14px;
-      background: #fff;
-      border:1px solid var(--line);
-      box-shadow: 0 10px 22px rgba(17,24,39,.08);
+      background: linear-gradient(180deg, rgba(37,99,235,.12), rgba(255,255,255,.98));
+      border:1px solid rgba(37,99,235,.28);
+      box-shadow: 0 12px 28px rgba(17,24,39,.14);
       display:grid;
       gap:6px;
 
@@ -277,7 +277,7 @@
     }
     .bubble .text{
       font-size:12px;
-      color: var(--muted);
+      color: #374151;
       line-height:1.45;
     }
 
@@ -490,7 +490,7 @@
           <div class="lanes">
             <!-- ALICE -->
             <div class="lane" id="laneAlice">
-              <h2>Alice (You) 🐰 <span class="tag" id="aliceStepTag">Step 1/4</span></h2>
+              <h2>Alice (You) 🐰</h2>
 
               <div class="character">
                 <div class="avatar">🐰</div>
@@ -526,13 +526,11 @@
 
                 <button class="primary" id="btnSend" disabled>Send Through Channel 🚀</button>
               </div>
-
-              <div class="footerHint">Tip: Wrong basis (lens) → random measurement.</div>
             </div>
 
             <!-- CHANNEL -->
             <div class="lane">
-              <h2>Quantum Channel 🌌 <span class="tag">Animated</span></h2>
+              <h2>Quantum Channel 🌌</h2>
 
               <div class="channel">
                 <div class="labels"><span>from Alice</span><span>to Bob</span></div>
@@ -550,17 +548,12 @@
                 <div class="pipe" id="pipe">
                   <div class="photon" id="photon" aria-label="photon">⚛️</div>
                 </div>
-
-                <div class="row" style="margin: 15px 5px 40px 5px">
-                  <button class="blue" id="btnRevealBases" disabled>Reveal Bases 🗣️</button>
-                  <button class="blue" id="btnNextRound" disabled>Next Photon ➡️</button>
-                </div>
               </div>
             </div>
 
             <!-- BOB -->
             <div class="lane" id="laneBob">
-              <h2>Bob 🤖 <span class="tag" id="bobStepTag">Waiting…</span></h2>
+              <h2>Bob 🤖</h2>
 
               <div class="character">
                 <div class="avatar bob">🤖</div>
@@ -574,6 +567,10 @@
                 <div class="stat"><span>Bob's chosen basis</span><b id="bobBasis">—</b></div>
                 <div class="stat"><span>Bob's measured bit</span><b id="bobBit">—</b></div>
                 <button class="blue" id="btnMeasure" disabled>Bob Measures 🎛️</button>
+                <div class="row">
+                  <button class="blue" id="btnRevealBases" disabled>Reveal Bases 🗣️</button>
+                  <button class="blue" id="btnNextRound" disabled>Next Photon ➡️</button>
+                </div>
               </div>
 
               <div class="footerHint">Fun fact: Wrong basis → random result 🎲</div>
@@ -617,7 +614,7 @@
       <section class="card panel">
         <h3>Authors</h3>
         <div class="footerHint">
-          Made by <b>Lidjia Petrovic</b>, <b>Mar Lopez</b> and <b>Javier Fernández</b> for the
+          Made by <b>Lidjia Petrovic</b>, <b>Mar López</b> and <b>Javier Fernández</b> for the
           <b>Quantum Communications and Cryptography</b> course of the <b>University of Barcelona</b>.
           <br><br>
           GitHub: <a href="https://github.com/jjavierf64/bb84-website" target="_blank" rel="noopener noreferrer">github.com/jjavierf64/bb84-website</a>
@@ -665,9 +662,6 @@
     const laneAlice = document.getElementById("laneAlice");
     const laneBob = document.getElementById("laneBob");
 
-    const aliceStepTag = document.getElementById("aliceStepTag");
-    const bobStepTag = document.getElementById("bobStepTag");
-
     const photon = document.getElementById("photon");
     const pipe = document.getElementById("pipe");
 
@@ -690,8 +684,6 @@
       bubbleTitle.textContent = title;
       bubbleText.textContent = text;
       bubble.classList.add("show");
-      clearTimeout(setBubble._t);
-      setBubble._t = setTimeout(() => bubble.classList.remove("show"), 6000);
     }
 
     function sparkle(x, y, char="✨"){
@@ -705,23 +697,6 @@
     }
 
     function updateUI(){
-      if (state.phase === "PICK"){
-        aliceStepTag.textContent = "Step 1/4";
-        bobStepTag.textContent = "Waiting…";
-      } else if (state.phase === "ENCODED"){
-        aliceStepTag.textContent = "Step 2/4";
-        bobStepTag.textContent = "Waiting…";
-      } else if (state.phase === "SENT"){
-        aliceStepTag.textContent = "Sent!";
-        bobStepTag.textContent = "Step 3/4";
-      } else if (state.phase === "MEASURED"){
-        aliceStepTag.textContent = "Sent!";
-        bobStepTag.textContent = "Measured!";
-      } else if (state.phase === "REVEALED"){
-        aliceStepTag.textContent = "Step 4/4";
-        bobStepTag.textContent = "Step 4/4";
-      }
-
       const hasPick = state.aliceBit !== null && state.aliceBasis !== null;
       btnEncode.disabled = !(state.phase === "PICK" && hasPick);
       btnSend.disabled = !(state.phase === "ENCODED");
