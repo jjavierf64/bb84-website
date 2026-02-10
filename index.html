@@ -333,6 +333,76 @@
     }
     .photon.fly{ animation: fly 1.25s ease-in-out forwards; }
 
+    .eveGameLayer{
+      position:absolute;
+      inset:0;
+      display:none;
+      z-index: 5;
+      pointer-events:none;
+    }
+    .eveGameLayer.show{ display:block; }
+    .goalGate{
+      position:absolute;
+      top:0;
+      right:0;
+      width:12px;
+      height:100%;
+      background: linear-gradient(180deg, rgba(16,185,129,.22), rgba(16,185,129,.14));
+      border-left:1px dashed rgba(16,185,129,.55);
+    }
+    .eveSprite,
+    .messageSprite{
+      position:absolute;
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      transform: translate(-50%, -50%);
+      font-size:20px;
+      box-shadow: 0 10px 20px rgba(17,24,39,.15);
+    }
+    .eveSprite{
+      background: rgba(239,68,68,.17);
+      border:1px solid rgba(239,68,68,.48);
+    }
+    .eveSprite.measure{
+      animation: eveMeasurePulse .65s ease-in-out 2;
+    }
+    .messageSprite{
+      background: rgba(16,185,129,.22);
+      border:1px solid rgba(16,185,129,.45);
+    }
+    .evePhotonSprite{
+      position:absolute;
+      width:34px;
+      height:34px;
+      border-radius:11px;
+      display:grid;
+      place-items:center;
+      transform: translate(-50%, -50%);
+      font-size:17px;
+      background: rgba(37,99,235,.18);
+      border:1px solid rgba(37,99,235,.45);
+      box-shadow: 0 10px 20px rgba(17,24,39,.16);
+      opacity:0;
+      transition: left 1.45s ease, opacity .24s ease;
+    }
+    .evePhotonSprite.show{ opacity:1; }
+    .eveHud{
+      position:absolute;
+      left:10px;
+      bottom:10px;
+      font-size:11px;
+      line-height:1.35;
+      color:#374151;
+      background: rgba(255,255,255,.9);
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:7px 9px;
+      max-width: 260px;
+    }
+
     /* Side */
     .side{ display:grid; gap:14px; }
     .panel{ padding:14px; }
@@ -369,6 +439,11 @@
       background: rgba(16,185,129,.12);
       color: #065f46;
     }
+    .bit.bad{
+      border-color: rgba(239,68,68,.45);
+      background: rgba(239,68,68,.13);
+      color:#991b1b;
+    }
 
     .footerHint{
       color: var(--muted);
@@ -390,6 +465,11 @@
       opacity:0;
       z-index: 4;
     }
+    @keyframes eveMeasurePulse {
+      0%{ transform: translate(-50%, -50%) scale(1); }
+      50%{ transform: translate(-50%, -50%) scale(1.16); }
+      100%{ transform: translate(-50%, -50%) scale(1); }
+    }
 
     /* =========================
        ✅ Tutorial popups (tour)
@@ -402,6 +482,180 @@
       z-index: 9999;
     }
     .tourOverlay.show{ display:block; }
+
+    .welcomeOverlay{
+      position:fixed;
+      inset:0;
+      background: rgba(17,24,39,.55);
+      display:none;
+      z-index: 11000;
+    }
+    .welcomeOverlay.show{
+      display:grid;
+      place-items:center;
+      padding:16px;
+    }
+    .welcomeModal{
+      width:min(860px, 100%);
+      max-height: min(85vh, 860px);
+      overflow:auto;
+      background: #fff;
+      border:1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 24px 60px rgba(17,24,39,.28);
+      padding:16px;
+      display:grid;
+      gap:12px;
+    }
+    .welcomeModal h2{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.2px;
+    }
+    .welcomeBody{
+      color:#374151;
+      font-size:13px;
+      line-height:1.6;
+      display:grid;
+      gap:10px;
+    }
+    .welcomeBody p{
+      margin:0;
+    }
+    .welcomeActions{
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+      gap:8px;
+      padding-top:2px;
+    }
+    .welcomeActions button{
+      width:auto;
+      min-height: 38px;
+      padding:8px 12px;
+      border-radius:10px;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .resultOverlay{
+      position:fixed;
+      inset:0;
+      background: rgba(17,24,39,.56);
+      display:none;
+      z-index: 12000;
+    }
+    .resultOverlay.show{
+      display:grid;
+      place-items:center;
+      padding:16px;
+    }
+    .resultModal{
+      position:relative;
+      width:min(680px, 100%);
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow: 0 24px 60px rgba(17,24,39,.28);
+      padding:16px;
+      overflow:hidden;
+      animation: resultPopIn .28s ease-out;
+    }
+    .resultModal.win{ border-color: rgba(16,185,129,.45); }
+    .resultModal.lose{ border-color: rgba(239,68,68,.45); }
+    .resultTitle{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin:0 0 8px;
+      font-size:18px;
+      letter-spacing:.2px;
+    }
+    .resultIcon{
+      width:32px;
+      height:32px;
+      border-radius:10px;
+      display:grid;
+      place-items:center;
+      font-size:20px;
+      background: rgba(17,24,39,.06);
+      border:1px solid var(--line);
+      flex:0 0 auto;
+    }
+    .resultModal.win .resultIcon{ animation: resultWinBob 1s ease-in-out infinite; }
+    .resultModal.lose .resultIcon{ animation: resultLoseShake .5s ease-in-out infinite; }
+    .resultBody{
+      font-size:13px;
+      color:#374151;
+      line-height:1.55;
+      display:grid;
+      gap:8px;
+      margin-bottom:10px;
+      position:relative;
+      z-index:2;
+    }
+    .resultBody p{ margin:0; }
+    .resultActions{
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      position:relative;
+      z-index:2;
+    }
+    .resultActions button{
+      width:auto;
+      min-height:38px;
+      padding:8px 12px;
+      border-radius:10px;
+      font-size:12px;
+      font-weight:700;
+    }
+    .resultBurst{
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:1;
+    }
+    .resultParticle{
+      position:absolute;
+      font-size:16px;
+      opacity:0;
+      left:var(--x);
+      bottom:-12px;
+      animation: resultRise var(--dur, 1.6s) ease-out var(--delay, 0s) forwards;
+    }
+    .resultParticle.lose{
+      top:-10px;
+      bottom:auto;
+      animation: resultDrop var(--dur, 1.4s) ease-in var(--delay, 0s) forwards;
+    }
+    @keyframes resultPopIn{
+      0%{ opacity:0; transform: translateY(10px) scale(.97); }
+      100%{ opacity:1; transform: translateY(0) scale(1); }
+    }
+    @keyframes resultRise{
+      0%{ opacity:0; transform: translateY(0) scale(.75) rotate(0deg); }
+      20%{ opacity:1; }
+      100%{ opacity:0; transform: translateY(-170px) scale(1.05) rotate(16deg); }
+    }
+    @keyframes resultDrop{
+      0%{ opacity:0; transform: translateY(0) rotate(0deg); }
+      20%{ opacity:1; }
+      100%{ opacity:0; transform: translateY(180px) rotate(-22deg); }
+    }
+    @keyframes resultWinBob{
+      0%{ transform: translateY(0) rotate(0deg); }
+      50%{ transform: translateY(-2px) rotate(7deg); }
+      100%{ transform: translateY(0) rotate(0deg); }
+    }
+    @keyframes resultLoseShake{
+      0%{ transform: translateX(0); }
+      25%{ transform: translateX(-1px); }
+      50%{ transform: translateX(1px); }
+      75%{ transform: translateX(-1px); }
+      100%{ transform: translateX(0); }
+    }
 
     .tourTooltip{
       position:fixed;
@@ -503,19 +757,19 @@
               <div class="controls">
                 <div class="bigChoice" id="bitChoices">
                   <div class="choice" data-bit="0" tabindex="0" id="bit0">
-                    <div class="icon">0️⃣</div><b>Bit = 0</b><span>Like “off” / “no”.</span>
+                    <div class="icon">0️⃣</div><b>Bit = 0</b>
                   </div>
                   <div class="choice" data-bit="1" tabindex="0" id="bit1">
-                    <div class="icon">1️⃣</div><b>Bit = 1</b><span>Like “on” / “yes”.</span>
+                    <div class="icon">1️⃣</div><b>Bit = 1</b>
                   </div>
                 </div>
 
                 <div class="bigChoice" id="basisChoices">
                   <div class="choice" data-basis="PLUS" tabindex="0" id="basisPlus">
-                    <div class="icon">➕</div><b>Basis = ➕</b><span>“Straight” lens.</span>
+                    <div class="icon">➕</div><b>Basis = ➕</b>
                   </div>
                   <div class="choice" data-basis="CROSS" tabindex="0" id="basisCross">
-                    <div class="icon">✖</div><b>Basis = ✖</b><span>“Diagonal” lens.</span>
+                    <div class="icon">✖</div><b>Basis = ✖</b>
                   </div>
                 </div>
 
@@ -547,6 +801,13 @@
 
                 <div class="pipe" id="pipe">
                   <div class="photon" id="photon" aria-label="photon">⚛️</div>
+                  <div class="eveGameLayer" id="eveGameLayer" aria-hidden="true">
+                    <div class="goalGate" aria-hidden="true"></div>
+                    <div class="eveSprite" id="eveSprite" aria-label="Eve">🕵️</div>
+                    <div class="messageSprite" id="messageSprite" aria-label="Message">💌</div>
+                    <div class="evePhotonSprite" id="evePhotonSprite" aria-label="Eve Photon">⚛️</div>
+                    <div class="eveHud" id="eveHud">Use Arrow keys or WASD. Reach Bob's side without being intercepted by Eve.</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -573,7 +834,6 @@
                 </div>
               </div>
 
-              <div class="footerHint">Fun fact: Wrong basis → random result 🎲</div>
             </div>
           </div>
         </div>
@@ -591,8 +851,13 @@
           </div>
 
           <div class="stat">
-            <span>Sifted key (kept bits)</span>
-            <div class="keyline" id="keyBits"></div>
+            <span>Alice sifted key</span>
+            <div class="keyline" id="aliceKeyBits"></div>
+          </div>
+
+          <div class="stat">
+            <span>Bob sifted key</span>
+            <div class="keyline" id="bobKeyBits"></div>
           </div>
 
           <div class="footerHint">Keep bits only when bases match (➕➕ or ✖✖).</div>
@@ -606,6 +871,8 @@
           Later they compare bases (not bits). Matching bases become shared secret bits.
         </div>
         <div style="margin-top:10px; display:grid; gap:10px;">
+          <button class="primary" id="btnFinalizeGame">Finalize Game 🧪</button>
+          <button class="warn" id="btnEveMode">Eve Attack: OFF</button>
           <button class="danger" id="btnResetAll">Reset Everything</button>
         </div>
       </section>
@@ -621,6 +888,41 @@
         </div>
       </section>
     </aside>
+  </div>
+
+  <div class="resultOverlay" id="resultOverlay">
+    <div class="resultModal" id="resultModal" role="dialog" aria-modal="true" aria-label="Game Result">
+      <div class="resultBurst" id="resultBurst" aria-hidden="true"></div>
+      <h2 class="resultTitle"><span class="resultIcon" id="resultIcon">🏁</span><span id="resultTitle">Game Result</span></h2>
+      <div class="resultBody" id="resultBody"></div>
+      <div class="resultActions">
+        <button class="blue" id="resultCloseBtn" type="button">Continue</button>
+        <button class="primary" id="resultResetBtn" type="button">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="welcomeOverlay" id="welcomeOverlay">
+    <div class="welcomeModal" role="dialog" aria-modal="true" aria-label="Welcome to BB84 Quest">
+      <h2>Welcome to BB84 Quest</h2>
+      <div class="welcomeBody">
+        <p>In quantum communication, Alice and Bob need to share a secret key to encrypt messages (using a one-time pad). The challenge is creating that key securely over a channel that might be watched.</p>
+
+        <p>One famous way to do this is the BB84 protocol. Alice randomly chooses a basis (➕ or ×) and a bit (0 or 1), encodes it into a qubit, and sends it to Bob.</p>
+
+        <p>Bob also randomly chooses a basis and measures the qubit. Later, Alice and Bob publicly compare only which bases they used. If the bases match, they keep the bit; if not, they discard it. The kept bits form the secret key.</p>
+
+        <p>If an eavesdropper (Eve) tries to intercept, she must guess a basis. Guessing wrong disturbs the qubit, creating errors. That means Alice and Bob can detect her.</p>
+
+        <p>At the end, they compare a small random sample of their kept bits. Too many mismatches means someone interfered, so they throw the key away and restart.</p>
+
+        <p>You are Alice. Choose a basis and a bit, send photons to Bob, and see if you can build a secure key—or detect an attack.</p>
+
+      </div>
+      <div class="welcomeActions">
+        <button class="primary" id="welcomeStartBtn" type="button">Start Experiment</button>
+      </div>
+    </div>
   </div>
 
   <!-- ✅ Tutorial UI -->
@@ -644,9 +946,14 @@
       aliceBasis: null,
       bobBasis: null,
       bobBit: null,
+      eveIntercepted: false,
+      eveMeasureBasis: null,
+      eveMeasuredBit: null,
+      eveResendBasis: null,
       sent: 0,
       kept: 0,
-      key: []
+      aliceKey: [],
+      bobKey: []
     };
 
     const bitChoices = document.getElementById("bitChoices");
@@ -657,6 +964,8 @@
     const btnRevealBases = document.getElementById("btnRevealBases");
     const btnNextRound = document.getElementById("btnNextRound");
     const btnResetRound = document.getElementById("btnResetRound");
+    const btnFinalizeGame = document.getElementById("btnFinalizeGame");
+    const btnEveMode = document.getElementById("btnEveMode");
     const btnResetAll = document.getElementById("btnResetAll");
 
     const laneAlice = document.getElementById("laneAlice");
@@ -664,6 +973,11 @@
 
     const photon = document.getElementById("photon");
     const pipe = document.getElementById("pipe");
+    const eveGameLayer = document.getElementById("eveGameLayer");
+    const eveSprite = document.getElementById("eveSprite");
+    const messageSprite = document.getElementById("messageSprite");
+    const evePhotonSprite = document.getElementById("evePhotonSprite");
+    const eveHud = document.getElementById("eveHud");
 
     const bubble = document.getElementById("bubble");
     const bubbleTitle = document.getElementById("bubbleTitle");
@@ -674,16 +988,82 @@
 
     const sentCount = document.getElementById("sentCount");
     const keptCount = document.getElementById("keptCount");
-    const keyBits = document.getElementById("keyBits");
+    const aliceKeyBits = document.getElementById("aliceKeyBits");
+    const bobKeyBits = document.getElementById("bobKeyBits");
+    const resultOverlay = document.getElementById("resultOverlay");
+    const resultModal = document.getElementById("resultModal");
+    const resultBurst = document.getElementById("resultBurst");
+    const resultIcon = document.getElementById("resultIcon");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultBody = document.getElementById("resultBody");
+    const resultCloseBtn = document.getElementById("resultCloseBtn");
+    const resultResetBtn = document.getElementById("resultResetBtn");
 
     const randBit = () => (Math.random() < 0.5 ? 0 : 1);
     const randBasis = () => (Math.random() < 0.5 ? "PLUS" : "CROSS");
     const basisIcon = (b) => (b === "PLUS" ? "➕" : b === "CROSS" ? "✖" : "—");
+    const clamp = (v, min, max) => Math.max(min, Math.min(v, max));
+
+    const eveMode = {
+      enabled: false,
+      active: false,
+      postAttackAnimating: false,
+      raf: 0,
+      resolve: null,
+      lastTs: 0,
+      keys: new Set(),
+      message: { x: 0, y: 0, r: 20, speed: 260 },
+      eve: { x: 0, y: 0, r: 20, vx: 180, vy: 150 }
+    };
 
     function setBubble(title, text){
       bubbleTitle.textContent = title;
       bubbleText.textContent = text;
       bubble.classList.add("show");
+    }
+
+    function spawnResultParticles(win){
+      resultBurst.innerHTML = "";
+      const icons = win ? ["✨", "🔐", "✅", "🎉"] : ["⚠️", "❌", "💥", "🕵️"];
+      const count = win ? 24 : 20;
+      for (let i = 0; i < count; i += 1){
+        const p = document.createElement("span");
+        p.className = `resultParticle ${win ? "win" : "lose"}`;
+        p.textContent = icons[Math.floor(Math.random() * icons.length)];
+        p.style.setProperty("--x", `${8 + Math.random() * 84}%`);
+        p.style.setProperty("--delay", `${Math.random() * 0.8}s`);
+        p.style.setProperty("--dur", `${1.2 + Math.random() * 0.9}s`);
+        resultBurst.appendChild(p);
+      }
+    }
+
+    function hideResultOverlay(){
+      resultOverlay.classList.remove("show");
+      resultModal.classList.remove("win");
+      resultModal.classList.remove("lose");
+      resultBurst.innerHTML = "";
+    }
+
+    function showResultOverlay(win){
+      resultModal.classList.remove("win");
+      resultModal.classList.remove("lose");
+      resultModal.classList.add(win ? "win" : "lose");
+      resultIcon.textContent = win ? "🏆" : "🚨";
+      resultTitle.textContent = win ? "Keys Match — You Win!" : "Keys Mismatch — You Lose";
+      if (win){
+        resultBody.innerHTML = `
+          <p>Congratulations! You now share a key with Bob.</p>
+          <p>For this game, we compare the full raw key and both keys match, so your communication is secure.</p>
+        `;
+      } else {
+        resultBody.innerHTML = `
+          <p>Congratulations! You now share a key with Bob. But is the key really secret? We compared Bob's key and found errors.</p>
+          <p>This suggests Eve may have attacked the process. The key must be discarded, so you lose this round.</p>
+          <p>In real BB84, Alice and Bob compare only a random sample (about 10-20%) to estimate error rate; in this game we compare the full raw key.</p>
+        `;
+      }
+      spawnResultParticles(win);
+      resultOverlay.classList.add("show");
     }
 
     function sparkle(x, y, char="✨"){
@@ -696,33 +1076,235 @@
       setTimeout(() => s.remove(), 800);
     }
 
+    function positionSprite(el, x, y){
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+    }
+
+    function resetEveChallenge(){
+      const r = pipe.getBoundingClientRect();
+      const w = Math.max(220, r.width);
+      const h = Math.max(180, r.height);
+
+      eveMode.message.x = 28;
+      eveMode.message.y = h * 0.5;
+      eveMode.eve.x = w * 0.62;
+      eveMode.eve.y = h * 0.5;
+      eveMode.eve.vx = (Math.random() < 0.5 ? -1 : 1) * (170 + Math.random() * 50);
+      eveMode.eve.vy = (Math.random() < 0.5 ? -1 : 1) * (130 + Math.random() * 50);
+
+      positionSprite(messageSprite, eveMode.message.x, eveMode.message.y);
+      positionSprite(eveSprite, eveMode.eve.x, eveMode.eve.y);
+      evePhotonSprite.classList.remove("show");
+    }
+
+    function updateEveToggleButton(){
+      btnEveMode.textContent = eveMode.enabled ? "Eve Attack: ON 🕵️" : "Eve Attack: OFF";
+    }
+
+    function hideEveLayer(){
+      eveGameLayer.classList.remove("show");
+      eveGameLayer.setAttribute("aria-hidden", "true");
+      eveHud.textContent = "Use Arrow keys or WASD. Reach Bob's side without being intercepted by Eve.";
+      evePhotonSprite.classList.remove("show");
+      eveSprite.classList.remove("measure");
+    }
+
+    function finishEveChallenge(intercepted = false, keepLayer = false){
+      if (!eveMode.active) return;
+      eveMode.active = false;
+      eveMode.keys.clear();
+      cancelAnimationFrame(eveMode.raf);
+      if (!keepLayer){
+        hideEveLayer();
+      }
+      window.removeEventListener("keydown", onEveKeyDown);
+      window.removeEventListener("keyup", onEveKeyUp);
+      if (eveMode.resolve){
+        const resolver = eveMode.resolve;
+        eveMode.resolve = null;
+        resolver(intercepted);
+      }
+      updateUI();
+    }
+
+    function onEveKeyDown(e){
+      if (!eveMode.active) return;
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d", "W", "A", "S", "D"].includes(e.key)){
+        e.preventDefault();
+        eveMode.keys.add(e.key.toLowerCase());
+      }
+    }
+
+    function onEveKeyUp(e){
+      if (!eveMode.active) return;
+      eveMode.keys.delete(e.key.toLowerCase());
+    }
+
+    function winEveMode(){
+      const r = pipe.getBoundingClientRect();
+      sparkle(r.width * 0.9, r.height * 0.5, "✅");
+      finishEveChallenge(false);
+    }
+
+    function loseEveMode(){
+      const r = pipe.getBoundingClientRect();
+      sparkle(r.width * 0.64, r.height * 0.5, "⚠️");
+      finishEveChallenge(true, true);
+    }
+
+    function runEveMode(ts){
+      if (!eveMode.active) return;
+
+      const r = pipe.getBoundingClientRect();
+      const w = Math.max(220, r.width);
+      const h = Math.max(180, r.height);
+      const dt = Math.min(0.04, (ts - eveMode.lastTs) / 1000 || 0.016);
+      eveMode.lastTs = ts;
+
+      const left = eveMode.keys.has("arrowleft") || eveMode.keys.has("a");
+      const right = eveMode.keys.has("arrowright") || eveMode.keys.has("d");
+      const up = eveMode.keys.has("arrowup") || eveMode.keys.has("w");
+      const down = eveMode.keys.has("arrowdown") || eveMode.keys.has("s");
+
+      let dx = (right ? 1 : 0) - (left ? 1 : 0);
+      let dy = (down ? 1 : 0) - (up ? 1 : 0);
+      if (dx !== 0 && dy !== 0){
+        dx *= 0.7071;
+        dy *= 0.7071;
+      }
+
+      eveMode.message.x += dx * eveMode.message.speed * dt;
+      eveMode.message.y += dy * eveMode.message.speed * dt;
+      eveMode.message.x = clamp(eveMode.message.x, eveMode.message.r, w - eveMode.message.r);
+      eveMode.message.y = clamp(eveMode.message.y, eveMode.message.r, h - eveMode.message.r);
+
+      eveMode.eve.x += eveMode.eve.vx * dt;
+      eveMode.eve.y += eveMode.eve.vy * dt;
+      if (eveMode.eve.x <= eveMode.eve.r || eveMode.eve.x >= w - eveMode.eve.r){
+        eveMode.eve.vx *= -1;
+        eveMode.eve.x = clamp(eveMode.eve.x, eveMode.eve.r, w - eveMode.eve.r);
+      }
+      if (eveMode.eve.y <= eveMode.eve.r || eveMode.eve.y >= h - eveMode.eve.r){
+        eveMode.eve.vy *= -1;
+        eveMode.eve.y = clamp(eveMode.eve.y, eveMode.eve.r, h - eveMode.eve.r);
+      }
+
+      positionSprite(messageSprite, eveMode.message.x, eveMode.message.y);
+      positionSprite(eveSprite, eveMode.eve.x, eveMode.eve.y);
+
+      const dxHit = eveMode.message.x - eveMode.eve.x;
+      const dyHit = eveMode.message.y - eveMode.eve.y;
+      const hitDist = eveMode.message.r + eveMode.eve.r - 4;
+      if ((dxHit * dxHit + dyHit * dyHit) <= (hitDist * hitDist)){
+        loseEveMode();
+        return;
+      }
+
+      if (eveMode.message.x >= w - eveMode.message.r - 8){
+        winEveMode();
+        return;
+      }
+
+      eveMode.raf = requestAnimationFrame(runEveMode);
+    }
+
+    function startEveChallenge(){
+      if (eveMode.active) return;
+      eveMode.active = true;
+      eveGameLayer.classList.add("show");
+      eveGameLayer.setAttribute("aria-hidden", "false");
+      eveHud.textContent = "Eve attack in progress. Use Arrow keys or WASD and get the message to Bob.";
+      photon.className = "photon";
+      photon.style.opacity = "0";
+      resetEveChallenge();
+      updateUI();
+      eveMode.lastTs = performance.now();
+      window.addEventListener("keydown", onEveKeyDown);
+      window.addEventListener("keyup", onEveKeyUp);
+      eveMode.raf = requestAnimationFrame(runEveMode);
+      return new Promise((resolve) => {
+        eveMode.resolve = resolve;
+      });
+    }
+
+    async function animateEveAttackSequence(measureBasis, resendBasis){
+      const r = pipe.getBoundingClientRect();
+      const y = clamp(eveMode.eve.y, 20, Math.max(20, r.height - 20));
+
+      eveHud.textContent = `Eve measures in basis ${basisIcon(measureBasis)}...`;
+      eveSprite.classList.add("measure");
+      sparkle(eveMode.eve.x, y, "📏");
+      await wait(980);
+      eveSprite.classList.remove("measure");
+
+      eveHud.textContent = `Eve re-encodes in random basis ${basisIcon(resendBasis)}...`;
+      sparkle(eveMode.eve.x, y, "🔐");
+      await wait(820);
+
+      evePhotonSprite.style.left = `${eveMode.eve.x}px`;
+      evePhotonSprite.style.top = `${y}px`;
+      evePhotonSprite.classList.add("show");
+
+      await wait(140);
+      eveHud.textContent = "Eve sends her photon to Bob.";
+      sparkle(eveMode.eve.x, y, "🚀");
+      evePhotonSprite.style.left = `${Math.max(eveMode.eve.x + 8, r.width - 22)}px`;
+
+      await wait(1500);
+      evePhotonSprite.classList.remove("show");
+    }
+
     function updateUI(){
+      const blockForEveMode = eveMode.active || eveMode.postAttackAnimating;
       const hasPick = state.aliceBit !== null && state.aliceBasis !== null;
-      btnEncode.disabled = !(state.phase === "PICK" && hasPick);
-      btnSend.disabled = !(state.phase === "ENCODED");
-      btnMeasure.disabled = !(state.phase === "SENT");
-      btnRevealBases.disabled = !(state.phase === "MEASURED");
-      btnNextRound.disabled = !(state.phase === "REVEALED");
+      btnEncode.disabled = blockForEveMode || !(state.phase === "PICK" && hasPick);
+      btnSend.disabled = blockForEveMode || !(state.phase === "ENCODED");
+      btnMeasure.disabled = blockForEveMode || !(state.phase === "SENT");
+      btnRevealBases.disabled = blockForEveMode || !(state.phase === "MEASURED");
+      btnNextRound.disabled = blockForEveMode || !(state.phase === "REVEALED");
+      btnResetRound.disabled = blockForEveMode;
+      btnEveMode.disabled = blockForEveMode;
+      btnResetAll.disabled = blockForEveMode;
+      btnFinalizeGame.disabled = blockForEveMode;
 
       bobBasisEl.textContent = basisIcon(state.bobBasis);
       bobBitEl.textContent = (state.bobBit === null ? "—" : String(state.bobBit));
 
       sentCount.textContent = String(state.sent);
-      keptCount.textContent = String(state.kept);
+      keptCount.textContent = String(state.aliceKey.length);
 
-      keyBits.innerHTML = "";
-      state.key.forEach((b) => {
-        const el = document.createElement("div");
-        el.className = "bit keep";
-        el.textContent = b;
-        keyBits.appendChild(el);
-      });
-      if(state.key.length === 0){
-        const ghost = document.createElement("div");
-        ghost.className = "bit";
-        ghost.style.opacity = ".6";
-        ghost.textContent = "—";
-        keyBits.appendChild(ghost);
+      aliceKeyBits.innerHTML = "";
+      bobKeyBits.innerHTML = "";
+      const maxKeyLen = Math.max(state.aliceKey.length, state.bobKey.length);
+      for (let i = 0; i < maxKeyLen; i += 1){
+        const a = state.aliceKey[i];
+        const b = state.bobKey[i];
+        const aEl = document.createElement("div");
+        aEl.className = "bit keep";
+        aEl.textContent = (a ?? "—");
+        aliceKeyBits.appendChild(aEl);
+
+        const bEl = document.createElement("div");
+        bEl.className = "bit keep";
+        bEl.textContent = (b ?? "—");
+        if (a !== undefined && b !== undefined && a !== b){
+          bEl.classList.add("bad");
+        }
+        bobKeyBits.appendChild(bEl);
+      }
+      if (maxKeyLen === 0){
+        const ghostA = document.createElement("div");
+        ghostA.className = "bit";
+        ghostA.style.opacity = ".6";
+        ghostA.textContent = "—";
+        aliceKeyBits.appendChild(ghostA);
+
+        const ghostB = document.createElement("div");
+        ghostB.className = "bit";
+        ghostB.style.opacity = ".6";
+        ghostB.textContent = "—";
+        bobKeyBits.appendChild(ghostB);
       }
 
       // keep tutorial gating responsive
@@ -739,6 +1321,10 @@
       state.aliceBasis = null;
       state.bobBasis = null;
       state.bobBit = null;
+      state.eveIntercepted = false;
+      state.eveMeasureBasis = null;
+      state.eveMeasuredBit = null;
+      state.eveResendBasis = null;
 
       clearSelections(bitChoices);
       clearSelections(basisChoices);
@@ -746,19 +1332,27 @@
       photon.className = "photon";
       photon.style.left = "12%";
       photon.style.opacity = "0";
+      hideEveLayer();
+      eveMode.postAttackAnimating = false;
 
       updateUI();
     }
 
     function resetAll(){
+      finishEveChallenge(false);
+      hideEveLayer();
+      hideResultOverlay();
+      eveMode.postAttackAnimating = false;
       state.sent = 0;
       state.kept = 0;
-      state.key = [];
+      state.aliceKey = [];
+      state.bobKey = [];
       resetRound();
       setBubble("Clean Slate", "Everything reset. Let's build a new key!");
     }
 
     function selectBit(bit){
+      if (eveMode.active || eveMode.postAttackAnimating) return;
       state.aliceBit = bit;
       clearSelections(bitChoices);
       bitChoices.querySelector(`[data-bit="${bit}"]`).classList.add("selected");
@@ -767,6 +1361,7 @@
     }
 
     function selectBasis(basis){
+      if (eveMode.active || eveMode.postAttackAnimating) return;
       state.aliceBasis = basis;
       clearSelections(basisChoices);
       basisChoices.querySelector(`[data-basis="${basis}"]`).classList.add("selected");
@@ -815,8 +1410,43 @@
       state.phase = "SENT";
       state.sent += 1;
 
-      setBubble("Sending", "Photon is traveling through the quantum channel…");
+      state.eveIntercepted = false;
+      state.eveMeasureBasis = null;
+      state.eveMeasuredBit = null;
+      state.eveResendBasis = null;
+
+      if (eveMode.enabled){
+        setBubble("Sending (Eve ON)", "Guide the message to Bob. If Eve touches it, she intercepts and attacks.");
+      } else {
+        setBubble("Sending", "Photon is traveling through the quantum channel…");
+      }
       updateUI();
+
+      if (eveMode.enabled){
+        const intercepted = await startEveChallenge();
+        state.eveIntercepted = intercepted;
+
+        if (intercepted){
+          state.eveMeasureBasis = randBasis();
+          state.eveMeasuredBit = (state.eveMeasureBasis === state.aliceBasis) ? state.aliceBit : randBit();
+          state.eveResendBasis = randBasis();
+          eveMode.postAttackAnimating = true;
+          updateUI();
+          await animateEveAttackSequence(state.eveMeasureBasis, state.eveResendBasis);
+          eveMode.postAttackAnimating = false;
+          hideEveLayer();
+          setBubble(
+            "Eve intercepted!",
+            `Eve measured in ${basisIcon(state.eveMeasureBasis)} and resent using random basis ${basisIcon(state.eveResendBasis)}.`
+          );
+        } else {
+          hideEveLayer();
+          setBubble("Arrived", "Photon reached Bob without interception. Now Bob measures with a random basis.");
+        }
+
+        updateUI();
+        return;
+      }
 
       photon.classList.add("fly");
       photon.style.opacity = "1";
@@ -832,16 +1462,33 @@
 
     btnMeasure.addEventListener("click", () => {
       state.bobBasis = randBasis();
-      const match = (state.bobBasis === state.aliceBasis);
-      state.bobBit = match ? state.aliceBit : randBit();
+      let sourceBasis = state.aliceBasis;
+      let sourceBit = state.aliceBit;
+      let viaEve = false;
+      if (eveMode.enabled && state.eveIntercepted){
+        sourceBasis = state.eveResendBasis;
+        sourceBit = state.eveMeasuredBit;
+        viaEve = true;
+      }
+      const match = (state.bobBasis === sourceBasis);
+      state.bobBit = match ? sourceBit : randBit();
 
       state.phase = "MEASURED";
 
-      setBubble("Measured",
-        match
-          ? "Bases match, so Bob gets the correct bit."
-          : "Bases differ, so the result becomes random."
-      );
+      if (viaEve){
+        setBubble(
+          "Measured after Eve",
+          match
+            ? `Bob matched Eve's resend basis ${basisIcon(sourceBasis)}, so he reads Eve's bit.`
+            : "Bob used a different basis than Eve's resend basis, so the result is random."
+        );
+      } else {
+        setBubble("Measured",
+          match
+            ? "Bases match, so Bob gets the correct bit."
+            : "Bases differ, so the result becomes random."
+        );
+      }
 
       const r = pipe.getBoundingClientRect();
       sparkle(r.width * 0.85, r.height * 0.62, match ? "✓" : "🎲");
@@ -855,7 +1502,8 @@
       const match = (state.bobBasis === state.aliceBasis);
       if (match){
         state.kept += 1;
-        state.key.push(String(state.aliceBit));
+        state.aliceKey.push(String(state.aliceBit));
+        state.bobKey.push(String(state.bobBit));
       }
 
       setBubble("Reveal bases",
@@ -878,15 +1526,49 @@
     });
 
     btnResetAll.addEventListener("click", resetAll);
+    btnFinalizeGame.addEventListener("click", () => {
+      if (state.aliceKey.length === 0 || state.bobKey.length === 0){
+        setBubble("Finalize game", "Build some sifted key bits first, then finalize and compare keys.");
+        return;
+      }
+      const sameLength = state.aliceKey.length === state.bobKey.length;
+      const sameBits = sameLength && state.aliceKey.every((bit, i) => bit === state.bobKey[i]);
+      showResultOverlay(sameBits);
+      if (sameBits){
+        setBubble("Victory", "Alice and Bob keys match. Secret key accepted.");
+      } else {
+        setBubble("Mismatch detected", "Alice and Bob keys differ. Key discarded due to possible Eve attack.");
+      }
+    });
+    btnEveMode.addEventListener("click", () => {
+      if (eveMode.active) return;
+      eveMode.enabled = !eveMode.enabled;
+      updateEveToggleButton();
+      if (eveMode.enabled){
+        setBubble("Eve mode enabled", "When you click Send, Eve will try to intercept in-channel.");
+        if (!eveModeTutorialSeen && !tourActive){
+          eveModeTutorialSeen = true;
+          setTimeout(() => tutorialStart(eveModeTutorialSteps), 180);
+        }
+      } else {
+        setBubble("Eve mode disabled", "Standard BB84 flow restored (no Eve interception challenge).");
+      }
+    });
 
     function wait(ms){ return new Promise(res => setTimeout(res, ms)); }
+    resultCloseBtn.addEventListener("click", hideResultOverlay);
+    resultResetBtn.addEventListener("click", () => {
+      hideResultOverlay();
+      resetAll();
+    });
 
     /* =========================
        ✅ Guided tutorial logic
        ========================= */
-    const TOUR_KEY = "bb84_tutorial_done_v1";
     const overlay = document.getElementById("tourOverlay");
     const tooltip = document.getElementById("tourTooltip");
+    const welcomeOverlay = document.getElementById("welcomeOverlay");
+    const welcomeStartBtn = document.getElementById("welcomeStartBtn");
     const tourTitleEl = document.getElementById("tourTitle");
     const tourBodyEl = document.getElementById("tourBody");
     const tourCounterEl = document.getElementById("tourCounter");
@@ -896,8 +1578,10 @@
     let tourActive = false;
     let tourIndex = 0;
     let tourHighlightEl = null;
+    let currentTourSteps = [];
+    let eveModeTutorialSeen = false;
 
-    const tourSteps = [
+    const mainTourSteps = [
       {
         title: "Welcome!",
         body: "This quick tutorial will guide you through one full BB84 round. Click Next to begin.",
@@ -947,6 +1631,12 @@
         canProceed: () => state.phase === "PICK"
       },
       {
+        title: "Optional — Eve mode",
+        body: "Turn on Eve Attack mode to simulate interception attacks during Send.",
+        target: "#btnEveMode",
+        canProceed: () => true
+      },
+      {
         title: "All set!",
         body: "You finished the guided round. Have fun experimenting!",
         target: ".board",
@@ -955,11 +1645,42 @@
       }
     ];
 
-    function tutorialShouldRun(){
-      return localStorage.getItem(TOUR_KEY) !== "1";
-    }
+    const eveModeTutorialSteps = [
+      {
+        title: "Eve Mode Enabled",
+        body: "Great. Eve Attack mode is now ON.",
+        target: "#btnEveMode",
+        canProceed: () => true
+      },
+      {
+        title: "When it runs",
+        body: "After you Encode and click Send, the channel challenge starts.",
+        target: "#btnSend",
+        canProceed: () => true
+      },
+      {
+        title: "How to control",
+        body: "Use Arrow keys or WASD to guide the message to Bob's side.",
+        target: "#pipe",
+        canProceed: () => true
+      },
+      {
+        title: "If Eve intercepts",
+        body: "Eve measures, re-encodes with a random basis, and sends her photon to Bob.",
+        target: "#pipe",
+        canProceed: () => true
+      },
+      {
+        title: "Why this matters",
+        body: "Interceptions can create Alice/Bob key mismatches. Use Finalize Game to compare keys.",
+        target: "#btnFinalizeGame",
+        canProceed: () => true,
+        finish: true
+      }
+    ];
 
-    function tutorialStart(){
+    function tutorialStart(steps = mainTourSteps){
+      currentTourSteps = steps;
       tourActive = true;
       tourIndex = 0;
       overlay.classList.add("show");
@@ -971,7 +1692,6 @@
 
     function tutorialFinish(){
       tourActive = false;
-      localStorage.setItem(TOUR_KEY, "1");
       overlay.classList.remove("show");
       tooltip.classList.remove("show");
       clearHighlight();
@@ -992,10 +1712,10 @@
     }
 
     function showTourStep(){
-      const step = tourSteps[tourIndex];
+      const step = currentTourSteps[tourIndex];
       tourTitleEl.textContent = step.title;
       tourBodyEl.textContent = step.body;
-      tourCounterEl.textContent = `${tourIndex + 1} / ${tourSteps.length}`;
+      tourCounterEl.textContent = `${tourIndex + 1} / ${currentTourSteps.length}`;
 
       clearHighlight();
       const targetEl = getTargetEl(step);
@@ -1013,7 +1733,7 @@
 
     function positionTooltip(){
       if (!tourActive) return;
-      const step = tourSteps[tourIndex];
+      const step = currentTourSteps[tourIndex];
       const targetEl = getTargetEl(step);
       const r = targetEl.getBoundingClientRect();
 
@@ -1037,7 +1757,7 @@
 
     function tutorialUpdate(){
       if (!tourActive) return;
-      const step = tourSteps[tourIndex];
+      const step = currentTourSteps[tourIndex];
       const ok = !!step.canProceed?.();
       tourNextBtn.disabled = !ok;
 
@@ -1052,14 +1772,14 @@
 
     tourNextBtn.addEventListener("click", () => {
       if (!tourActive) return;
-      const step = tourSteps[tourIndex];
+      const step = currentTourSteps[tourIndex];
       if (!step.finish && step.canProceed && !step.canProceed()) return;
 
       if (step.finish){
         tutorialFinish();
         return;
       }
-      tourIndex = Math.min(tourIndex + 1, tourSteps.length - 1);
+      tourIndex = Math.min(tourIndex + 1, currentTourSteps.length - 1);
       showTourStep();
     });
 
@@ -1067,21 +1787,31 @@
       tutorialFinish();
     });
 
-    // Start tutorial only on first playthrough
+    // Start tutorial on each page load
     function maybeStartTutorial(){
-      if (tutorialShouldRun()){
-        // Show tutorial after first render
-        setTimeout(() => tutorialStart(), 250);
-      }
+      // Show tutorial after first render
+      setTimeout(() => tutorialStart(), 250);
     }
+
+    function showWelcome(){
+      welcomeOverlay.classList.add("show");
+    }
+
+    function closeWelcomeAndStartTutorial(){
+      welcomeOverlay.classList.remove("show");
+      maybeStartTutorial();
+    }
+
+    welcomeStartBtn.addEventListener("click", closeWelcomeAndStartTutorial);
 
     /* =========================
        Init
        ========================= */
     resetRound();
+    updateEveToggleButton();
     setBubble("Welcome", "Pick a bit (0/1) and a basis (➕/✖), then encode.");
     updateUI();
-    maybeStartTutorial();
+    showWelcome();
   </script>
 </body>
 </html>
