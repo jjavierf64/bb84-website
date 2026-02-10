@@ -480,6 +480,7 @@
       background: rgba(17,24,39,.35);
       display:none;
       z-index: 9999;
+      pointer-events:none;
     }
     .tourOverlay.show{ display:block; }
 
@@ -514,7 +515,7 @@
     }
     .welcomeBody{
       color:#374151;
-      font-size:13px;
+      font-size:15px;
       line-height:1.6;
       display:grid;
       gap:10px;
@@ -667,12 +668,13 @@
       padding:12px;
       z-index: 10000;
       display:none;
+      pointer-events:none;
     }
     .tourTooltip.show{ display:block; }
 
     .tourTitle{
       font-weight:800;
-      font-size:13px;
+      font-size:14px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -681,7 +683,7 @@
     }
     .tourBody{
       color: var(--muted);
-      font-size:12px;
+      font-size:14px;
       line-height:1.45;
       margin-bottom:10px;
     }
@@ -690,6 +692,7 @@
       gap:8px;
       justify-content:flex-end;
       align-items:center;
+      pointer-events:auto;
     }
     .tourActions button{
       width:auto;
@@ -711,11 +714,18 @@
 
     .tourHighlight{
       position:relative;
-      z-index: 10001; /* above overlay */
+      z-index: 10050; /* above overlay + tooltip */
       outline: 3px solid rgba(37,99,235,.35);
       border-radius: 14px;
       box-shadow: 0 0 0 8px rgba(37,99,235,.10);
       transition: outline-color .18s ease, box-shadow .18s ease;
+      opacity: 1 !important;
+      pointer-events: auto;
+    }
+    .tourHighlight button,
+    .tourHighlight .choice{
+      opacity: 1 !important;
+      pointer-events: auto;
     }
 
     @media (max-width: 980px){
@@ -1518,6 +1528,17 @@
     btnNextRound.addEventListener("click", () => {
       resetRound();
       setBubble("Next photon", "Pick a new bit and basis.");
+      nextPhotonPressCount += 1;
+      if (
+        nextPhotonPressCount >= 2 &&
+        !eveTogglePressedEver &&
+        !eveInterceptHintShown &&
+        !eveModeTutorialSeen &&
+        !tourActive
+      ){
+        eveInterceptHintShown = true;
+        setTimeout(() => tutorialStart(eveInterceptHintSteps), 180);
+      }
     });
 
     btnResetRound.addEventListener("click", () => {
@@ -1542,6 +1563,7 @@
     });
     btnEveMode.addEventListener("click", () => {
       if (eveMode.active) return;
+      eveTogglePressedEver = true;
       eveMode.enabled = !eveMode.enabled;
       updateEveToggleButton();
       if (eveMode.enabled){
@@ -1580,6 +1602,9 @@
     let tourHighlightEl = null;
     let currentTourSteps = [];
     let eveModeTutorialSeen = false;
+    let nextPhotonPressCount = 0;
+    let eveTogglePressedEver = false;
+    let eveInterceptHintShown = false;
 
     const mainTourSteps = [
       {
@@ -1631,12 +1656,6 @@
         canProceed: () => state.phase === "PICK"
       },
       {
-        title: "Optional — Eve mode",
-        body: "Turn on Eve Attack mode to simulate interception attacks during Send.",
-        target: "#btnEveMode",
-        canProceed: () => true
-      },
-      {
         title: "All set!",
         body: "You finished the guided round. Have fun experimenting!",
         target: ".board",
@@ -1674,6 +1693,22 @@
         title: "Why this matters",
         body: "Interceptions can create Alice/Bob key mismatches. Use Finalize Game to compare keys.",
         target: "#btnFinalizeGame",
+        canProceed: () => true,
+        finish: true
+      }
+    ];
+
+    const eveInterceptHintSteps = [
+      {
+        title: "Heads up: Eve attack",
+        body: "You can enable Eve Attack mode to simulate interception during Send.",
+        target: "#btnEveMode",
+        canProceed: () => true
+      },
+      {
+        title: "What Eve does",
+        body: "If she intercepts, Eve measures, re-encodes in a random basis, and sends her photon to Bob.",
+        target: "#pipe",
         canProceed: () => true,
         finish: true
       }
